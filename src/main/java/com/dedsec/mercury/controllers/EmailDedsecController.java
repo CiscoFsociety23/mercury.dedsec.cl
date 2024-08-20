@@ -33,6 +33,19 @@ public class EmailDedsecController {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
-    }
+    };
+
+    @PostMapping("/sendHtmlMail")
+    public ResponseEntity<?> sendHtmlMail(@RequestBody SimpleEmail emailData){
+        try {
+            logger.info("[ POST /sendHtmlMail ]: Iniciando envio de correo Html, asunto: " + emailData.getSubject());
+            emailService.sendHtmlMail(emailData, "Plantilla Bienvenida");
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("[ POST /sendHtmlMail ]: Ha ocurrido un error al procesar el envio");
+            e.printStackTrace();
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+        }
+    };
 
 }
