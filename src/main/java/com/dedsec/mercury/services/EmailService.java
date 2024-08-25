@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.dedsec.mercury.models.SimpleEmail;
+import com.dedsec.mercury.models.WelcomeEmail;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -43,24 +44,25 @@ public class EmailService {
         }
     };
 
-    public void sendHtmlMail(SimpleEmail emailData, String layoutName) {
+    public void sendWelcomeHtmlMail(WelcomeEmail emailData) {
         try {
-            logger.info("[ METHOD: sendHtmlMail() ]: Construyendo envio de correo HTML a: " + emailData.getReciever());
-            String plantilla = propertyService.getProperty(layoutName);
+            logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Construyendo envio de correo HTML a: " + emailData.getReciever());
+            String plantilla = propertyService.getProperty("Plantilla Bienvenida");
             byte[] platillaByte = Base64.getDecoder().decode(plantilla);
             String plantillaHtml = new String(platillaByte);
-            logger.info("[ METHOD: sendHtmlMail() ]: Obteniendo html de la propiedad");
+            logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Obteniendo html de la propiedad");
+            String plantillaHtmlOf = plantillaHtml.replace("{nombre}", emailData.getUserName());
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setTo(emailData.getReciever());
             helper.setFrom(senderUser);
             helper.setSubject(emailData.getSubject());
-            helper.setText(plantillaHtml, true);
-            logger.info("[ METHOD: sendHtmlMail() ]: Procesando envio...");
+            helper.setText(plantillaHtmlOf, true);
+            logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Procesando envio...");
             mailSender.send(mimeMessage);
-            logger.info("[ METHOD: sendHtmlMail() ]: Correo HTML enviado con exito a: " + emailData.getReciever());
+            logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Correo HTML enviado con exito a: " + emailData.getReciever());
         } catch (Exception e) {
-            logger.error("[ METHOD: sendHtmlMail() ]: Ha ocurrido un error en la construccion/envio de correo HTML");
+            logger.error("[ METHOD: sendWelcomeHtmlMail() ]: Ha ocurrido un error en la construccion/envio de correo HTML");
             e.printStackTrace();
         }
     };

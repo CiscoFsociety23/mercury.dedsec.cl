@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dedsec.mercury.models.SimpleEmail;
+import com.dedsec.mercury.models.WelcomeEmail;
 import com.dedsec.mercury.services.EmailService;
 
 @RestController
@@ -35,14 +36,14 @@ public class EmailDedsecController {
         }
     };
 
-    @PostMapping("/sendHtmlMail")
-    public ResponseEntity<?> sendHtmlMail(@RequestBody SimpleEmail emailData){
+    @PostMapping("/sendWelcomeHtmlMail")
+    public ResponseEntity<?> sendWelcomeHtmlMail(@RequestBody WelcomeEmail emailData){
         try {
-            logger.info("[ POST /sendHtmlMail ]: Iniciando envio de correo Html, asunto: " + emailData.getSubject());
-            emailService.sendHtmlMail(emailData, "Plantilla Bienvenida");
+            logger.info("[ POST /sendWelcomeHtmlMail ]: Iniciando envio de correo Html, asunto: " + emailData.getSubject());
+            emailService.sendWelcomeHtmlMail(emailData);
             return new ResponseEntity<>(true, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("[ POST /sendHtmlMail ]: Ha ocurrido un error al procesar el envio");
+            logger.error("[ POST /sendWelcomeHtmlMail ]: Ha ocurrido un error al procesar el envio");
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
