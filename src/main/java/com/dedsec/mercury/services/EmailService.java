@@ -91,4 +91,17 @@ public class EmailService {
         }
     };
 
+    public Boolean getRedinessValue(){
+        try {
+            logger.info("[ METHOD: getRedinessValue() ]: Obteniendo prueba rendiness");
+            String rediness_val = propertyService.getProperty("Email Rediness");
+            Boolean rediness = Boolean.parseBoolean(rediness_val);
+            return rediness;
+        } catch (Exception e) {
+            logger.info("[ METHOD: getRedinessValue() ]: Ha ocurrido un error el obtener rediness");
+            logger.error("[ METHOD: getRedinessValue() ]: " + e.getMessage());
+            return false;
+        }
+    }
+
 }
