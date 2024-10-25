@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,19 @@ public class EmailDedsecController {
     private EmailService emailService;
     
     private final Logger logger = LoggerFactory.getLogger(EmailDedsecController.class);
+
+    @GetMapping("/redinessEmail")
+    public ResponseEntity<?> redinessEmail(){
+        try {
+            logger.info("[ GET /redinessEmail ]: Verificando estado del servicio");
+            Boolean rediness = emailService.getRedinessValue();
+            return new ResponseEntity<>(rediness, HttpStatus.OK);
+        } catch (Exception e){
+            logger.error("[ GET /redinessEmail ]: Ha ocurrido un error al obtener el estado del servicio");
+            logger.error("[ GET /redinessEmail ]: " + e.getMessage());
+            return new ResponseEntity<>(false, HttpStatus.OK);
+        }
+    }
 
     @PostMapping("/sendSimpleMail")
     public ResponseEntity<?> sendSimpleMail(@RequestBody SimpleEmail emailData) {
