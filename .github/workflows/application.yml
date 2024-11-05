@@ -50,6 +50,7 @@ jobs:
             spring.mail.protocol=smtp
             spring.mail.properties.mail.smtp.auth=true
             spring.mail.properties.mail.smtp.starttls.enable=true
+            spring.datasource.hikari.maximum-pool-size=1
             " > ./src/main/resources/application.properties
 
       - name: Construyendo WAR
