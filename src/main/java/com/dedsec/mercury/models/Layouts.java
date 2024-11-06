@@ -15,17 +15,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Property {
+public class Layouts {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer idLayout;
 
     @Basic
-    private String prop;
+    private String layoutName;
 
     @Lob
     @Column(columnDefinition = "TEXT")
-    private String value;
+    private String layout;
 
 }

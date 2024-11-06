@@ -10,9 +10,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.dedsec.mercury.models.SimpleEmail;
-import com.dedsec.mercury.models.ValidacionEmail;
-import com.dedsec.mercury.models.WelcomeEmail;
+import com.dedsec.mercury.dto.SimpleEmail;
+import com.dedsec.mercury.dto.ValidacionEmail;
+import com.dedsec.mercury.dto.WelcomeEmail;
+import com.dedsec.mercury.models.Layouts;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final PropertyService propertyService;
+    private final LayoutService layoutService;
+    private final DeliveryRegistryService deliveryRegistryService;
 
     @Value("${spring.mail.username}")
     private String senderUser;
@@ -48,7 +51,8 @@ public class EmailService {
     public void sendWelcomeHtmlMail(WelcomeEmail emailData) {
         try {
             logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Construyendo envio de correo HTML a: " + emailData.getReciever());
-            String plantilla = propertyService.getProperty("Plantilla Bienvenida");
+            Layouts layouts = layoutService.getLayout("Plantilla Bienvenida");
+            String plantilla = layouts.getLayout();
             byte[] platillaByte = Base64.getDecoder().decode(plantilla);
             String plantillaHtml = new String(platillaByte);
             logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Obteniendo html de la propiedad");
@@ -62,6 +66,7 @@ public class EmailService {
             logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Procesando envio...");
             mailSender.send(mimeMessage);
             logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Correo HTML enviado con exito a: " + emailData.getReciever());
+            deliveryRegistryService.saveDeliveryRegistry(layouts, emailData.getSubject(), emailData.getReciever());
         } catch (Exception e) {
             logger.error("[ METHOD: sendWelcomeHtmlMail() ]: Ha ocurrido un error en la construccion/envio de correo HTML");
             e.printStackTrace();
@@ -71,7 +76,8 @@ public class EmailService {
     public void sendValidationHtmlMail(ValidacionEmail emailData) {
         try {
             logger.info("[ METHOD: sendValidationHtmlMail() ]: Construyendo envio de correo HTML a: " + emailData.getReciever());
-            String plantilla = propertyService.getProperty("Plantilla Validacion");
+            Layouts layouts = layoutService.getLayout("Plantilla Validacion");
+            String plantilla = layouts.getLayout();
             byte[] platillaByte = Base64.getDecoder().decode(plantilla);
             String plantillaHtml = new String(platillaByte);
             logger.info("[ METHOD: sendValidationHtmlMail() ]: Obteniendo html de la propiedad");
@@ -85,6 +91,7 @@ public class EmailService {
             logger.info("[ METHOD: sendValidationHtmlMail() ]: Procesando envio...");
             mailSender.send(mimeMessage);
             logger.info("[ METHOD: sendValidationHtmlMail() ]: Correo HTML enviado con exito a: " + emailData.getReciever());
+            deliveryRegistryService.saveDeliveryRegistry(layouts, emailData.getSubject(), emailData.getReciever());
         } catch (Exception e) {
             logger.error("[ METHOD: sendValidationHtmlMail() ]: Ha ocurrido un error en la construccion/envio de correo HTML");
             e.printStackTrace();

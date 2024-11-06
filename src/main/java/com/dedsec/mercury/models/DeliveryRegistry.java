@@ -1,12 +1,14 @@
 package com.dedsec.mercury.models;
 
+import java.util.Date;
+
 import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,17 +17,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Property {
+public class DeliveryRegistry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer idDeliveryRegistry;
+
+    @ManyToOne
+    @JoinColumn(name = "idLayout", nullable = false)
+    private Layouts layoutType;
 
     @Basic
-    private String prop;
-
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String value;
+    private String subject;
+    private String reciever;
+    private Date sendTime;
 
 }

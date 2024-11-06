@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dedsec.mercury.models.SimpleEmail;
-import com.dedsec.mercury.models.ValidacionEmail;
-import com.dedsec.mercury.models.WelcomeEmail;
+import com.dedsec.mercury.dto.SimpleEmail;
+import com.dedsec.mercury.dto.ValidacionEmail;
+import com.dedsec.mercury.dto.WelcomeEmail;
 import com.dedsec.mercury.services.EmailService;
 
 @RestController
