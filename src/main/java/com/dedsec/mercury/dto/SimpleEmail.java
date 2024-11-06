@@ -1,4 +1,4 @@
-package com.dedsec.mercury.models;
+package com.dedsec.mercury.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
