@@ -10,9 +10,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.dedsec.mercury.models.SimpleEmail;
-import com.dedsec.mercury.models.ValidacionEmail;
-import com.dedsec.mercury.models.WelcomeEmail;
+import com.dedsec.mercury.dto.SimpleEmail;
+import com.dedsec.mercury.dto.ValidacionEmail;
+import com.dedsec.mercury.dto.WelcomeEmail;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
