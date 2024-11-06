@@ -17,14 +17,14 @@ public class LayoutService {
     private final Logger logger = LoggerFactory.getLogger(LayoutService.class);
     private final LayoutsRepository layoutsRepository;
 
-    public String getLayout(String layoutName){
+    public Layouts getLayout(String layoutName){
         try {
             logger.info("[ METHOD: getLayout() ]: Obteniendo Plantilla " + layoutName);
             Optional<Layouts> layout = layoutsRepository.findByLayoutName(layoutName);
-            return layout.get().getLayout();
+            return layout.get();
         } catch (Exception e) {
             logger.error("[ METHOD: getLayout() ]: Ha ocurrido un error al obtener la plantilla");
-            return e.getMessage();
+            return null;
         }
     }
 
