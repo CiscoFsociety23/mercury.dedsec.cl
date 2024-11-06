@@ -23,6 +23,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final PropertyService propertyService;
+    private final LayoutService layoutService;
 
     @Value("${spring.mail.username}")
     private String senderUser;
@@ -48,7 +49,7 @@ public class EmailService {
     public void sendWelcomeHtmlMail(WelcomeEmail emailData) {
         try {
             logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Construyendo envio de correo HTML a: " + emailData.getReciever());
-            String plantilla = propertyService.getProperty("Plantilla Bienvenida");
+            String plantilla = layoutService.getLayout("Plantilla Bienvenida");
             byte[] platillaByte = Base64.getDecoder().decode(plantilla);
             String plantillaHtml = new String(platillaByte);
             logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Obteniendo html de la propiedad");
@@ -71,7 +72,7 @@ public class EmailService {
     public void sendValidationHtmlMail(ValidacionEmail emailData) {
         try {
             logger.info("[ METHOD: sendValidationHtmlMail() ]: Construyendo envio de correo HTML a: " + emailData.getReciever());
-            String plantilla = propertyService.getProperty("Plantilla Validacion");
+            String plantilla = layoutService.getLayout("Plantilla Validacion");
             byte[] platillaByte = Base64.getDecoder().decode(plantilla);
             String plantillaHtml = new String(platillaByte);
             logger.info("[ METHOD: sendValidationHtmlMail() ]: Obteniendo html de la propiedad");
