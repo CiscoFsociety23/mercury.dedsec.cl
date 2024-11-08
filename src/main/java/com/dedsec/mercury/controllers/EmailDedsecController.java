@@ -8,22 +8,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dedsec.mercury.dto.SimpleEmail;
 import com.dedsec.mercury.dto.ValidacionEmail;
 import com.dedsec.mercury.dto.WelcomeEmail;
+import com.dedsec.mercury.middlewares.EmailDedsecMiddleware;
 import com.dedsec.mercury.services.EmailService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/EmailDedsec")
+@RequiredArgsConstructor
 public class EmailDedsecController {
 
     @Autowired
     private EmailService emailService;
     
     private final Logger logger = LoggerFactory.getLogger(EmailDedsecController.class);
+    private final EmailDedsecMiddleware emailDedsecMiddleware;
 
     @GetMapping("/redinessEmail")
     public ResponseEntity<?> redinessEmail(){
@@ -39,11 +45,18 @@ public class EmailDedsecController {
     }
 
     @PostMapping("/sendSimpleMail")
-    public ResponseEntity<?> sendSimpleMail(@RequestBody SimpleEmail emailData) {
+    public ResponseEntity<?> sendSimpleMail(@RequestBody SimpleEmail emailData, @RequestHeader("Authorization") String bearerToken) {
         try {
-            logger.info("[ POST /sendSimpleMail ]: Iniciando envio de correo simple, asunto: " + emailData.getSubject());
-            emailService.sendSimpleMail(emailData);
-            return new ResponseEntity<>(true, HttpStatus.OK);
+            logger.info("[ POST /sendSimpleMail ]: Obteniendo header de autorizacion");
+            String token = bearerToken.split(" ")[1];
+            if(emailDedsecMiddleware.verificarAdminProfile(token)){
+                logger.info("[ POST /sendSimpleMail ]: Iniciando envio de correo simple, asunto: " + emailData.getSubject());
+                emailService.sendSimpleMail(emailData);
+                return new ResponseEntity<>(true, HttpStatus.OK);
+            } else {
+                logger.info("[ POST /sendSimpleMail ]: Perfil no valido para enviar correos");
+                return new ResponseEntity<>(false, HttpStatus.OK);
+            }
         } catch (Exception e) {
             logger.error("[ POST /sendSimpleMail ]: Ha ocurrido un error al procesar el envio");
             e.printStackTrace();
