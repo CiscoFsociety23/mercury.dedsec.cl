@@ -5,7 +5,6 @@ import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -35,13 +34,21 @@ public class EmailService {
     public void sendSimpleMail(SimpleEmail emailData){
         try {
             logger.info("[ METHOD: sendSimpleMail() ]: Construyendo envio de correo a: " + emailData.getReciever());
-            SimpleMailMessage email = new SimpleMailMessage();     
-            email.setTo(emailData.getReciever());
-            email.setFrom(senderUser);
-            email.setSubject(emailData.getSubject());
-            email.setText(emailData.getMessage());
-            mailSender.send(email);
+            Layouts layouts = layoutService.getLayout("Plantilla Mensaje Simple");
+            String plantilla = layouts.getLayout();
+            byte[] platillaByte = Base64.getDecoder().decode(plantilla);
+            String plantillaHtml = new String(platillaByte);
+            String plantillaHtmlFull = plantillaHtml.replace("{message}", emailData.getMessage());
+            logger.info("[ METHOD: sendWelcomeHtmlMail() ]: Obteniendo html de la propiedad");
+            MimeMessage mimeMesagge = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMesagge, true, "UTF-8");
+            helper.setTo(emailData.getReciever());
+            helper.setFrom(senderUser);
+            helper.setSubject(emailData.getSubject());
+            helper.setText(plantillaHtmlFull, true);
+            mailSender.send(mimeMesagge);
             logger.info("[ METHOD: sendSimpleMail() ]: Correo enviado con exito a: " + emailData.getReciever());
+            deliveryRegistryService.saveDeliveryRegistry(layouts, emailData.getSubject(), emailData.getReciever());
         } catch (Exception e) {
             logger.error("[ METHOD: sendSimpleMail() ]: Ha ocurrido un error en la contruccion/envio de correo");
             e.printStackTrace();
