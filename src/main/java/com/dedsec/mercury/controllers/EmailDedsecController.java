@@ -65,11 +65,18 @@ public class EmailDedsecController {
     };
 
     @PostMapping("/sendWelcomeHtmlMail")
-    public ResponseEntity<?> sendWelcomeHtmlMail(@RequestBody WelcomeEmail emailData){
+    public ResponseEntity<?> sendWelcomeHtmlMail(@RequestBody WelcomeEmail emailData, @RequestHeader("Authorization") String bearerToken){
         try {
-            logger.info("[ POST /sendWelcomeHtmlMail ]: Iniciando envio de correo Html, asunto: " + emailData.getSubject());
-            emailService.sendWelcomeHtmlMail(emailData);
-            return new ResponseEntity<>(true, HttpStatus.OK);
+            logger.info("[ POST /sendWelcomeHtmlMail ]: Obteniendo header de autorizacion");
+            String token = bearerToken.split(" ")[1];
+            if(emailDedsecMiddleware.verificarAdminProfile(token)){
+                logger.info("[ POST /sendWelcomeHtmlMail ]: Iniciando envio de correo Html, asunto: " + emailData.getSubject());
+                emailService.sendWelcomeHtmlMail(emailData);
+                return new ResponseEntity<>(true, HttpStatus.OK);
+            } else {
+                logger.info("[ POST /sendWelcomeHtmlMail ]: Perfil no valido para enviar correos");
+                return new ResponseEntity<>(false, HttpStatus.OK);
+            }
         } catch (Exception e) {
             logger.error("[ POST /sendWelcomeHtmlMail ]: Ha ocurrido un error al procesar el envio");
             e.printStackTrace();
@@ -78,11 +85,18 @@ public class EmailDedsecController {
     };
 
     @PostMapping("/sendValidationHtmlMail")
-    public ResponseEntity<?> sendValidationHtmlMail(@RequestBody ValidacionEmail emailData){
+    public ResponseEntity<?> sendValidationHtmlMail(@RequestBody ValidacionEmail emailData, @RequestHeader("Authorization") String bearerToken){
         try {
-            logger.info("[ POST /sendValidationHtmlMail ]: Iniciando envio de correo Html, asunto: " + emailData.getSubject());
-            emailService.sendValidationHtmlMail(emailData);
-            return new ResponseEntity<>(true, HttpStatus.OK);
+            logger.info("[ POST /sendValidationHtmlMail ]: Obteniendo header de autorizacion");
+            String token = bearerToken.split(" ")[1];
+            if(emailDedsecMiddleware.verificarAdminProfile(token)){
+                logger.info("[ POST /sendValidationHtmlMail ]: Iniciando envio de correo Html, asunto: " + emailData.getSubject());
+                emailService.sendValidationHtmlMail(emailData);
+                return new ResponseEntity<>(true, HttpStatus.OK);
+            } else {
+                logger.info("[ POST /sendValidationHtmlMail ]: Usuario no valido para enviar correos");
+                return new ResponseEntity<>(false, HttpStatus.OK);
+            }
         } catch (Exception e) {
             logger.error("[ POST /sendValidationHtmlMail ]: Ha ocurrido un error al procesar el envio");
             e.printStackTrace();
