@@ -1,5 +1,7 @@
 package com.dedsec.mercury.controllers;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dedsec.mercury.dto.DeliveryRecord;
 import com.dedsec.mercury.dto.SimpleEmail;
 import com.dedsec.mercury.dto.ValidacionEmail;
 import com.dedsec.mercury.dto.WelcomeEmail;
 import com.dedsec.mercury.middlewares.EmailDedsecMiddleware;
+import com.dedsec.mercury.services.DeliveryRegistryService;
 import com.dedsec.mercury.services.EmailService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +34,7 @@ public class EmailDedsecController {
     
     private final Logger logger = LoggerFactory.getLogger(EmailDedsecController.class);
     private final EmailDedsecMiddleware emailDedsecMiddleware;
+    private final DeliveryRegistryService deliveryRegistryService;
 
     @GetMapping("/redinessEmail")
     public ResponseEntity<?> redinessEmail(){
@@ -103,5 +108,24 @@ public class EmailDedsecController {
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
     };
+
+    @GetMapping("/deliveryRecord")
+    public ResponseEntity<?> deliveryRecord(@RequestHeader("Authorization") String bearerToken){
+        try {
+            logger.info("[ GET /deliveryRecord ]: Obteniendo header de autorizacion");
+            String token = bearerToken.split(" ")[1];
+            if(emailDedsecMiddleware.verificarAdminProfile(token)){
+                logger.info("[ GET /deliveryRecord ]: Procesando listado de envio de correos");
+                List<DeliveryRecord> record= deliveryRegistryService.getDeliveryRegistry();
+                return new ResponseEntity<>(record, HttpStatus.OK);
+            } else {
+                logger.error("[ GET /deliveryRecord ]: Usuario no autorizado para ver registros");
+                return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            logger.error("[ GET /deliveryRecord ]: Ha ocurrido un error al procesar la solicitud. " + e.getMessage());
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }
