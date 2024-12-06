@@ -9,6 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.dedsec.mercury.dto.RegistroAsistencia;
 import com.dedsec.mercury.dto.SimpleEmail;
 import com.dedsec.mercury.dto.ValidacionEmail;
 import com.dedsec.mercury.dto.WelcomeEmail;
@@ -115,6 +116,34 @@ public class EmailService {
             logger.info("[ METHOD: getRedinessValue() ]: Ha ocurrido un error el obtener rediness");
             logger.error("[ METHOD: getRedinessValue() ]: " + e.getMessage());
             return false;
+        }
+    }
+
+    public void sendRegistroAsistencia(RegistroAsistencia registro){
+        try {
+            logger.info("[ METHOD: sendRegistroAsistencia() ]: Construyendo envio de correo HTML a: " + registro.getReciever());
+            Layouts layouts = layoutService.getLayout("Registro Asistencia");
+            String plantilla = layouts.getLayout();
+            byte[] platillaByte = Base64.getDecoder().decode(plantilla);
+            String plantillaHtml = new String(platillaByte);
+            logger.info("[ METHOD: sendRegistroAsistencia() ]: Obteniendo html de la propiedad");
+            String plantillaHtmlNombre = plantillaHtml.replace("{NOMBRE}", registro.getNombre());
+            String plantillaHtmlRut = plantillaHtmlNombre.replace("{RUT}", registro.getRut());
+            String plantillaHtmlTipoRegistro = plantillaHtmlRut.replace("{TIPO_REGISTRO}", registro.getTipoRegistro());
+            String plantillaHtmlOf = plantillaHtmlTipoRegistro.replace("{FECHA_HORA}", registro.getFechaHora());
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setTo(registro.getReciever());
+            helper.setFrom(senderUser);
+            helper.setSubject(registro.getSubject());
+            helper.setText(plantillaHtmlOf, true);
+            logger.info("[ METHOD: sendRegistroAsistencia() ]: Procesando envio...");
+            mailSender.send(mimeMessage);
+            logger.info("[ METHOD: sendRegistroAsistencia() ]: Correo HTML enviado con exito a: " + registro.getReciever());
+            deliveryRegistryService.saveDeliveryRegistry(layouts, registro.getSubject(), registro.getReciever());
+        } catch (Exception e) {
+            logger.error("[ METHOD: sendRegistroAsistencia() ]: Ha ocurrido un error en la construccion/envio de correo HTML");
+            e.printStackTrace();
         }
     }
 
