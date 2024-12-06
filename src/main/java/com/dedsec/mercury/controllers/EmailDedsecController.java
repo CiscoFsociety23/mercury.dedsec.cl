@@ -18,6 +18,7 @@ import com.dedsec.mercury.dto.DeliveryRecord;
 import com.dedsec.mercury.dto.SimpleEmail;
 import com.dedsec.mercury.dto.ValidacionEmail;
 import com.dedsec.mercury.dto.WelcomeEmail;
+import com.dedsec.mercury.dto.RegistroAsistencia;
 import com.dedsec.mercury.middlewares.EmailDedsecMiddleware;
 import com.dedsec.mercury.services.DeliveryRegistryService;
 import com.dedsec.mercury.services.EmailService;
@@ -127,5 +128,18 @@ public class EmailDedsecController {
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("sendRegistroAsistencia")
+    public ResponseEntity<?> sendRegistroAsistencia(@RequestBody RegistroAsistencia registro) {
+        try {
+            logger.info("[ POST /sendRegistroAsistencia ]: Procesando envio de registro de asistencia");
+            emailService.sendRegistroAsistencia(registro);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("[ POST /sendRegistroAsistencia ]: Ha ocurrido un error al procesar la solicitud. " + e.getMessage());
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
 
 }
